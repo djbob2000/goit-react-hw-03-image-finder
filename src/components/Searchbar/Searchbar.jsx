@@ -6,10 +6,11 @@ class Searchbar extends Component {
     searchQuery: '',
   };
 
+  // когда печатаем сюда это в стейт пишет
   changeInput = evt => {
     this.setState({ searchQuery: evt.target.value });
   };
-
+  // когда жмем субмит передает в пропс стейт серч квери и уходит отсюда в app
   handleSubmit = evt => {
     evt.preventDefault();
 
