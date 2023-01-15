@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-// import Loader from 'react-loader-spinner';
+import Loader from './Loader/Loader';
 import fetchImage from './services/api';
 import Searchbar from './Searchbar/Searchbar';
-// import ImageGallery from './components/ImageGallery';
-// import Notify from './components/Notify';
-// import Modal from './components/Modal';
+import ImageGallery from './ImageGallery/ImageGallery';
+import Notify from './Notify/Notify';
+import Modal from './Modal/Modal';
 import Button from './Button/Button';
 import css from './App.module.css';
 
@@ -17,24 +17,24 @@ class App extends Component {
     isLoading: false,
     error: null,
     emptyNotify: false,
-    // showPopup: false,
+    isModalOpen: false,
     showButton: false,
-    // targetImage: null,
+    targetImage: null,
   };
 
   componentDidMount() {
     this.searchImages();
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevState.searchQuery !== this.state.searchQuery) {
-  //     this.setState({ page: 1 });
-  //     this.searchImages();
-  //   }
-  //   if (prevState.page !== this.state.page) {
-  //     this.searchImages();
-  //   }
-  // }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.searchQuery !== this.state.searchQuery) {
+      this.setState({ page: 1 });
+      this.searchImages();
+    }
+    if (prevState.page !== this.state.page) {
+      this.searchImages();
+    }
+  }
 
   searchImages() {
     const { searchQuery, page } = this.state;
@@ -88,25 +88,27 @@ class App extends Component {
   };
 
   onEmptyImagesNotify = () => {
+    const { totalHits } = this.state;
     if (!totalHits) {
       this.setState({ emptyNotify: true });
     } else {
       this.setState({ emptyNotify: false });
     }
   };
-  // toggleModal = ({ status, src, alt }) => {
-  //   if (status) {
-  //     this.setState({
-  //       targetImage: { src, alt },
-  //       showPopup: true,
-  //     });
-  //   } else {
-  //     this.setState({
-  //       targetImage: null,
-  //       showPopup: false,
-  //     });
-  //   }
-  // };
+
+  toggleModal = ({ status, src, alt }) => {
+    if (status) {
+      this.setState({
+        targetImage: { src, alt },
+        isModalOpen: true,
+      });
+    } else {
+      this.setState({
+        targetImage: null,
+        isModalOpen: false,
+      });
+    }
+  };
 
   render() {
     const {
@@ -114,7 +116,7 @@ class App extends Component {
       isLoading,
       error,
       emptyNotify,
-      showPopup,
+      isModalOpen,
       targetImage,
       showButton,
     } = this.state;
@@ -122,23 +124,25 @@ class App extends Component {
     return (
       <div className={css.App}>
         <Searchbar onSubmit={this.onSubmit} />
-        {/* {error && <Notify message={`Что-то не так: ${error.message}`} />}
-        {isLoading && (
-          <Loader type="BallTriangle" color="#e91616" height={80} width={80} />
+        {error && (
+          <Notify message={`Huston, we have a problem: ${error.message}`} />
         )}
+
+        {isLoading && <Loader />}
+
         {images.length > 0 && (
           <ImageGallery images={images} toggleModal={this.toggleModal} />
         )}
-        {emptyNotify && (
-          <Notify message="Ничего не найдено, попробуй еще раз." />
-        )}
-        {showPopup && (
+
+        {emptyNotify && <Notify message="Nothing. Empty from your query." />}
+
+        {isModalOpen && (
           <Modal
             src={targetImage.src}
             alt={targetImage.alt}
             toggleModal={this.toggleModal}
           />
-        )} */}
+        )}
         {showButton && <Button onClick={this.onButtonMoreClick} />}
       </div>
     );

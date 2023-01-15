@@ -3,11 +3,9 @@ import css from './Button.module.css';
 
 const Button = ({ onClick }) => {
   return (
-    <div className={css.buttonBox}>
-      <button type="button" className={css.Button} onClick={onClick}>
-        Load more
-      </button>
-    </div>
+    <button type="button" className={css.Button} onClick={onClick}>
+      Load more
+    </button>
   );
 };
 
