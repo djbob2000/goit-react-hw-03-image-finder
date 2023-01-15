@@ -36,34 +36,67 @@ class App extends Component {
     }
   }
 
-  searchImages() {
+  // searchImages() {
+  //   const { searchQuery, page } = this.state;
+
+  //   this.setState({ isLoading: true });
+
+  //   fetchImage(searchQuery, page)
+  //     .then(data => {
+  //       console.log('page==>', page);
+  //       console.log('data==>', data);
+  //       if (page === 1) {
+  //         this.setState({
+  //           totalHits: data.totalHits,
+  //           images: data.hits,
+  //         });
+  //       } else {
+  //         this.setState(prevState => ({
+  //           images: [...prevState.images, ...data.hits],
+  //         }));
+  //         window.scrollTo({
+  //           top: document.documentElement.scrollHeight,
+  //           behavior: 'smooth',
+  //         });
+  //       }
+  //       this.checkButtonAndNotify();
+  //     })
+  //     .catch(error => this.setState({ error }))
+  //     .finally(() => this.setState({ isLoading: false }));
+  // }
+  // было, переписал на async
+  searchImages = async () => {
     const { searchQuery, page } = this.state;
 
     this.setState({ isLoading: true });
 
-    fetchImage(searchQuery, page)
-      .then(data => {
-        console.log('page==>', page);
-        console.log('data==>', data);
-        if (page === 1) {
-          this.setState({
-            totalHits: data.totalHits,
-            images: data.hits,
-          });
-        } else {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
-          }));
-          window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: 'smooth',
-          });
-        }
-        this.checkButtonAndNotify();
-      })
-      .catch(error => this.setState({ error }))
-      .finally(() => this.setState({ isLoading: false }));
-  }
+    try {
+      console.log('searchQuery==>', searchQuery);
+      const data = await fetchImage(searchQuery, page);
+      console.log('page==>', page);
+      if (page === 1) {
+        this.setState({
+          totalHits: data.totalHits,
+          images: data.hits,
+        });
+      } else {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...data.hits],
+        }));
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+      this.checkButtonAndNotify();
+    } catch (error) {
+      this.setState({ error });
+      console.log(error);
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
+
   // когда жмем на кнопку поиск это срабатует
   onSubmit = value => {
     this.setState({ searchQuery: value });
