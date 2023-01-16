@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Loader from './Loader/Loader';
-import fetchImage from './services/api';
+import fetchImage from '../services/api';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Notify from './Notify/Notify';
@@ -22,9 +22,9 @@ class App extends Component {
     targetImage: null,
   };
 
-  componentDidMount() {
-    this.searchImages();
-  }
+  // componentDidMount() {
+  //   this.searchImages();
+  // }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery) {
@@ -68,39 +68,50 @@ class App extends Component {
   searchImages = async () => {
     const { searchQuery, page } = this.state;
 
-    this.setState({ isLoading: true });
+    this.setState({ showButton: false });
 
     try {
-      console.log('searchQuery==>', searchQuery);
       const data = await fetchImage(searchQuery, page);
-      console.log('page==>', page);
+
+      this.setState({ isLoading: true });
+
+      const { hits, totalHits } = data;
+
+      const filteredHits = hits.map(
+        ({ id, tags, webformatURL, largeImageURL }) => ({
+          id,
+          tags,
+          webformatURL,
+          largeImageURL,
+        })
+      );
+
       if (page === 1) {
         this.setState({
-          totalHits: data.totalHits,
-          images: data.hits,
+          totalHits: totalHits,
+          images: filteredHits,
         });
       } else {
         this.setState(prevState => ({
-          images: [...prevState.images, ...data.hits],
+          images: [...prevState.images, ...filteredHits],
         }));
         window.scrollTo({
           top: document.documentElement.scrollHeight,
           behavior: 'smooth',
         });
       }
-      this.checkButtonAndNotify();
     } catch (error) {
       this.setState({ error });
       console.log(error);
     } finally {
       this.setState({ isLoading: false });
+      this.checkButtonAndNotify();
     }
   };
 
   // когда жмем на кнопку поиск это срабатует
   onSubmit = value => {
     this.setState({ searchQuery: value });
-    console.log(this.state);
   };
 
   onButtonMoreClick = () => {
@@ -161,11 +172,11 @@ class App extends Component {
           <Notify message={`Huston, we have a problem: ${error.message}`} />
         )}
 
-        {isLoading && <Loader />}
-
         {images.length > 0 && (
           <ImageGallery images={images} toggleModal={this.toggleModal} />
         )}
+
+        {isLoading && <Loader />}
 
         {emptyNotify && <Notify message="Nothing. Empty from your query." />}
 
