@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import css from './ImageGalleryItem.module.css';
 
 const ImageGalleryItem = ({ image }) => {
+  const { webformatURL, tags, largeImageURL } = image;
   return (
     <li className={css.ImageGalleryItem}>
       <img
-        src={image.webformatURL}
-        alt={image.tags}
-        data-imageurl={image.largeImageURL}
+        src={webformatURL}
+        alt={tags}
+        data-imageurl={largeImageURL}
         className={css['ImageGalleryItem-image']}
       />
     </li>
@@ -16,13 +17,11 @@ const ImageGalleryItem = ({ image }) => {
 };
 
 ImageGalleryItem.propTypes = {
-  image: PropTypes.arrayOf(
-    PropTypes.exact({
-      webformatURL: PropTypes.string.isRequired,
-      tags: PropTypes.string.isRequired,
-      largeImageURL: PropTypes.string.isRequired,
-    }).isRequired
-  ).isRequired,
+  image: PropTypes.shape({
+    webformatURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+    largeImageURL: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default ImageGalleryItem;

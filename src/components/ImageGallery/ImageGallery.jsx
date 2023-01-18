@@ -13,7 +13,6 @@ const ImageGallery = ({ images, toggleModal }) => {
       });
     }
   };
-
   return (
     <ul className={css.ImageGallery} onClick={checkEvent}>
       {images.map(image => (
@@ -25,11 +24,12 @@ const ImageGallery = ({ images, toggleModal }) => {
 
 ImageGallery.propTypes = {
   images: PropTypes.arrayOf(
-    PropTypes.exact({
-      image: PropTypes.string.isRequired,
-    }).isRequired
+    PropTypes.shape({
+      webformatURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+    })
   ).isRequired,
-  toggleModal: PropTypes.func.isRequired,
 };
 
 export default ImageGallery;

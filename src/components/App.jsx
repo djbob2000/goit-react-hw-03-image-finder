@@ -18,7 +18,6 @@ class App extends Component {
     error: null,
     emptyNotify: false,
     isModalOpen: false,
-    showButton: false,
     targetImage: null,
   };
 
@@ -27,53 +26,34 @@ class App extends Component {
   // }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
-      this.setState({ page: 1 });
-      this.searchImages();
-    }
-    if (prevState.page !== this.state.page) {
+    // if (prevState.searchQuery !== this.state.searchQuery) {
+    //   this.setState({ page: 1 });
+    //   this.searchImages();
+    // }
+    if (
+      prevState.page !== this.state.page ||
+      prevState.searchQuery !== this.state.searchQuery
+    ) {
       this.searchImages();
     }
   }
 
-  // searchImages() {
-  //   const { searchQuery, page } = this.state;
+  // когда жмем на кнопку поиск это срабатует
+  onSubmit = value => {
+    // this.setState({ searchQuery: value });
+    this.setState({
+      images: [],
+      searchQuery: value,
+      page: 1,
+    });
+  };
 
-  //   this.setState({ isLoading: true });
-
-  //   fetchImage(searchQuery, page)
-  //     .then(data => {
-  //       console.log('page==>', page);
-  //       console.log('data==>', data);
-  //       if (page === 1) {
-  //         this.setState({
-  //           totalHits: data.totalHits,
-  //           images: data.hits,
-  //         });
-  //       } else {
-  //         this.setState(prevState => ({
-  //           images: [...prevState.images, ...data.hits],
-  //         }));
-  //         window.scrollTo({
-  //           top: document.documentElement.scrollHeight,
-  //           behavior: 'smooth',
-  //         });
-  //       }
-  //       this.checkButtonAndNotify();
-  //     })
-  //     .catch(error => this.setState({ error }))
-  //     .finally(() => this.setState({ isLoading: false }));
-  // }
-  // было, переписал на async
   searchImages = async () => {
     const { searchQuery, page } = this.state;
-
-    this.setState({ showButton: false });
+    this.setState({ isLoading: true });
 
     try {
       const data = await fetchImage(searchQuery, page);
-
-      this.setState({ isLoading: true });
 
       const { hits, totalHits } = data;
 
@@ -105,30 +85,13 @@ class App extends Component {
       console.log(error);
     } finally {
       this.setState({ isLoading: false });
-      this.checkButtonAndNotify();
     }
-  };
-
-  // когда жмем на кнопку поиск это срабатует
-  onSubmit = value => {
-    this.setState({ searchQuery: value });
   };
 
   onButtonMoreClick = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
-  };
-
-  // Вырубаем кнопку если закончились
-  checkButtonAndNotify = () => {
-    const { totalHits, images } = this.state;
-
-    if (totalHits > images.length) {
-      this.setState({ showButton: true });
-    } else {
-      this.setState({ showButton: false });
-    }
   };
 
   onEmptyImagesNotify = () => {
@@ -157,12 +120,13 @@ class App extends Component {
   render() {
     const {
       images,
+      totalHits,
       isLoading,
       error,
       emptyNotify,
       isModalOpen,
       targetImage,
-      showButton,
+      // showButton,
     } = this.state;
 
     return (
@@ -176,6 +140,10 @@ class App extends Component {
           <ImageGallery images={images} toggleModal={this.toggleModal} />
         )}
 
+        {images.length === 0 || totalHits === images.length || (
+          <Button onClick={this.onButtonMoreClick} />
+        )}
+
         {isLoading && <Loader />}
 
         {emptyNotify && <Notify message="Nothing. Empty from your query." />}
@@ -187,10 +155,37 @@ class App extends Component {
             toggleModal={this.toggleModal}
           />
         )}
-        {showButton && <Button onClick={this.onButtonMoreClick} />}
       </div>
     );
   }
 }
 
 export default App;
+
+// searchImages() {
+//   const { searchQuery, page } = this.state;
+
+//   this.setState({ isLoading: true });
+
+//   fetchImage(searchQuery, page)
+//     .then(data => {
+//       if (page === 1) {
+//         this.setState({
+//           totalHits: data.totalHits,
+//           images: data.hits,
+//         });
+//       } else {
+//         this.setState(prevState => ({
+//           images: [...prevState.images, ...data.hits],
+//         }));
+//         window.scrollTo({
+//           top: document.documentElement.scrollHeight,
+//           behavior: 'smooth',
+//         });
+//       }
+//       this.checkButtonAndNotify();
+//     })
+//     .catch(error => this.setState({ error }))
+//     .finally(() => this.setState({ isLoading: false }));
+// }
+// было, переписал на async
