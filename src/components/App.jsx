@@ -140,7 +140,7 @@ class App extends Component {
           <ImageGallery images={images} toggleModal={this.toggleModal} />
         )}
 
-        {images.length === 0 || totalHits === images.length || (
+        {images.length === 0 || totalHits === images.length || isLoading || (
           <Button onClick={this.onButtonMoreClick} />
         )}
 
